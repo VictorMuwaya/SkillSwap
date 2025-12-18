@@ -2,9 +2,19 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { User } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// Lazy initialization of the AI client to ensure process.env shim is active
+let aiInstance: GoogleGenAI | null = null;
+
+const getAI = () => {
+  if (!aiInstance) {
+    const apiKey = process.env.API_KEY || "";
+    aiInstance = new GoogleGenAI({ apiKey });
+  }
+  return aiInstance;
+};
 
 export const getAIPartnerAdvice = async (me: User, partner: User) => {
+  const ai = getAI();
   const prompt = `
     Analyze the skill set of two community members and suggest why they might be a good swap match.
     User 1 (Me): ${me.name}. Offers: ${me.skillsOffered.map(s => s.name).join(", ")}. Needs: ${me.skillsNeeded.join(", ")}.
@@ -26,6 +36,7 @@ export const getAIPartnerAdvice = async (me: User, partner: User) => {
 };
 
 export const suggestSkillCategorization = async (description: string) => {
+  const ai = getAI();
   const response = await ai.models.generateContent({
     model: "gemini-3-flash-preview",
     contents: `Categorize this skill description into one of these: Home Maintenance, Education, Technology, Culinary, Arts & Crafts, Wellness, Pet Care, Gardening. Description: "${description}"`,
@@ -44,6 +55,7 @@ export const suggestSkillCategorization = async (description: string) => {
 };
 
 export const getChatAssistance = async (context: string, partnerName: string) => {
+  const ai = getAI();
   const prompt = `You are a helpful community assistant for a skill-swapping app. 
   The user is chatting with ${partnerName}. 
   The last few messages or current context: "${context}". 
