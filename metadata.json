@@ -1,0 +1,7 @@
+{
+  "name": "SkillSwap: Hyperlocal Community Exchange",
+  "description": "A trust-based platform for trading skills and time with neighbors. Exchange gardening for tutoring, or plumbing for baking, all within your local community.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
